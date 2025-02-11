@@ -75,7 +75,11 @@ document.querySelectorAll('.js-ad-to-cart').forEach((button) => {
             });
         }
 
-        console.log(cart); //Now correctly tracks new and existing items
+        let cartQuantity = 0;
+        cart.forEach((item) => {
+            cartQuantity += item.quantity;
+        });
+        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity; 
     });
 });
 
