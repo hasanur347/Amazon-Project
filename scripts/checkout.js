@@ -1,14 +1,19 @@
-import {cart, removeFromCart} from '../data/cart.js';
-import {products} from '../data/products.js';
+
+import { cart, removeFromCart } from '../data/cart.js';
+import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
+
 let cartProductsHTML = '';
+
 cart.forEach((cartItem) => {
     const productId = cartItem.productId;
     let matchingItem;
-    products.forEach((product)=> {
+    products.forEach((product) => {
         if (product.id === productId) {
             matchingItem = product;
-    }});
+        }
+    });
+
     cartProductsHTML += `
     <div class="cart-item-container 
     js-cart-item-container-${matchingItem.id}">
@@ -34,7 +39,7 @@ cart.forEach((cartItem) => {
                   <span class="update-quantity-link link-primary">
                     Update
                   </span>
-                  <span class="delete-quantity-link link-primary js-delete-link" data-product-id = ${matchingItem.id}>
+                  <span class="delete-quantity-link link-primary js-delete-link" data-product-id="${matchingItem.id}">
                     Delete
                   </span>
                 </div>
@@ -86,14 +91,58 @@ cart.forEach((cartItem) => {
               </div>
             </div>
           </div>
-    `
+    `;
 });
+
 document.querySelector('.js-order-summary').innerHTML = cartProductsHTML;
-document.querySelectorAll('.js-delete-link').forEach((link)=>{
-    link.addEventListener('click', ()=> {
+
+// Delete item from cart
+document.querySelectorAll('.js-delete-link').forEach((link) => {
+    link.addEventListener('click', () => {
         const productId = link.dataset.productId;
         removeFromCart(productId);
-        const container = document.querySelector(`.js-cart-item-container-${productId}`)
+        const container = document.querySelector(`.js-cart-item-container-${productId}`);
         container.remove();
-    })
-})
+        cartQuantityUpdate();
+        updateCartQuant();
+    });
+    
+});
+
+// Function to update cart quantity safely
+function cartQuantityUpdate() {
+  let cartQuantity = 0;
+  cart.forEach((cartItem) => {
+    cartQuantity += cartItem.quantity;
+  });
+
+  // Check if the cart quantity element exists before updating
+  const cartQuantityElement = document.querySelector('.js-cart-quantity');
+  if (cartQuantityElement) {
+    cartQuantityElement.innerHTML = cartQuantity;
+  }
+
+  // Store cart quantity in localStorage
+  localStorage.setItem('cartQuantity', cartQuantity);
+}
+
+// Retrieve cart quantity when page loads
+document.addEventListener("DOMContentLoaded", () => {
+  const storedCartQuantity = localStorage.getItem('cartQuantity');
+  if (storedCartQuantity) {
+    const cartQuantityElement = document.querySelector('.js-cart-quantity');
+    if (cartQuantityElement) {
+      cartQuantityElement.innerHTML = storedCartQuantity;
+    }
+  }
+});
+function updateCartQuant(){
+  let cartQuantity = 0;
+  cart.forEach((cartItem) => {
+    cartQuantity += cartItem.quantity;
+  });
+  document.querySelector('.js-return-to-home-link').innerHTML = `${cartQuantity} items`;
+}
+updateCartQuant();
+// Initial cart update
+cartQuantityUpdate();

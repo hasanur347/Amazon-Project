@@ -1,7 +1,10 @@
-import {cart, addToCart} from '../data/cart.js';
-import {products} from '../data/products.js';
+
+import { cart, addToCart } from '../data/cart.js';
+import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
+
 let productsHTML = '';
+
 products.forEach((product) => {
     productsHTML += `
          <div class="product-container">
@@ -48,28 +51,47 @@ products.forEach((product) => {
             Added
           </div>
 
-          <button class="add-to-cart-button button-primary js-ad-to-cart" data-product-id = '${product.id}'>
+          <button class="add-to-cart-button button-primary js-add-to-cart" data-product-id = '${product.id}'>
             Add to Cart
           </button>
         </div>
-    `
+    `;
 });
+
 document.querySelector('.js-product-grid').innerHTML = productsHTML;
-function cartQuantityUpdate(){
+
+// Function to update cart quantity safely
+function cartQuantityUpdate() {
   let cartQuantity = 0;
-        cart.forEach((cartItem) => {
-            cartQuantity += cartItem.quantity;
-        });
-        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity; 
+  cart.forEach((cartItem) => {
+    cartQuantity += cartItem.quantity;
+  });
+
+  // Check if element exists before updating it
+  const cartQuantityElement = document.querySelector('.js-cart-quantity');
+  if (cartQuantityElement) {
+    cartQuantityElement.innerHTML = cartQuantity;
+  }
+  
+  // Store cart quantity in localStorage
+  localStorage.setItem('cartQuantity', cartQuantity);
 }
-document.querySelectorAll('.js-ad-to-cart').forEach((button) => {
+
+// Retrieve cart quantity when page loads
+document.addEventListener("DOMContentLoaded", () => {
+  const storedCartQuantity = localStorage.getItem('cartQuantity');
+  if (storedCartQuantity) {
+    const cartQuantityElement = document.querySelector('.js-cart-quantity');
+    if (cartQuantityElement) {
+      cartQuantityElement.innerHTML = storedCartQuantity;
+    }
+  }
+});
+
+document.querySelectorAll('.js-add-to-cart').forEach((button) => {
     button.addEventListener('click', () => {
         const productId = button.dataset.productId;
         addToCart(productId);
         cartQuantityUpdate();
-        
     });
 });
-
-
-
