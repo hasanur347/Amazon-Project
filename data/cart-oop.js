@@ -21,7 +21,7 @@ function Cart(localStorageKey){
     },
 
     saveToStorage(){
-        localStorage.setItem('cart', JSON.stringify(cart));
+        localStorage.setItem(localStorageKey, JSON.stringify(cart));
     },
 
     addToCart(productId){
