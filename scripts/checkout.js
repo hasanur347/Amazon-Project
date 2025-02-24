@@ -4,9 +4,11 @@ import { products } from '../data/products.js';
 import { formatCurrency } from './utils/money.js';
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 import { deliveryOptions } from '../data/deliveryOption.js';
-import '../data/backend-practice.js'
+import { addOrder } from './order.js';
+//import '../data/backend-practice.js'
 let cartProductsHTML = '';
 let dateString='';
+
 
 cart.forEach((cartItem) => {
     const productId = cartItem.productId;
@@ -16,8 +18,6 @@ cart.forEach((cartItem) => {
             matchingItem = product;
         }
     });
-
-    
 
     cartProductsHTML += `
     <div class="cart-item-container 
@@ -163,3 +163,22 @@ function updateCartQuant(){
 }
 updateCartQuant();
 cartQuantityUpdate();
+
+document.querySelector('.js-order-button').addEventListener('click', async () => {
+  try {
+    const response = await fetch('https://supersimplebackend.dev/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        cart: cart
+      })
+    })
+    const order = response.json();
+    addOrder(order);
+  } catch(error){
+    console.log("unexpected error. Try again later")
+  }
+  window.location.href = 'orders.html'
+});
